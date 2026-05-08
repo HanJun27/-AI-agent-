@@ -1,0 +1,197 @@
+@startuml ZijinCollegeSystemArchitecture
+
+' 全局样式设置
+skinparam backgroundColor #FEFEFE
+skinparam shadowing false
+skinparam defaultFontName Microsoft YaHei
+
+' 组件样式
+skinparam rectangle {
+  BackgroundColor #E8F4F8
+  BorderColor #2C3E50
+  RoundCorner 10
+}
+
+skinparam database {
+  BackgroundColor #FFF5E6
+  BorderColor #E67E22
+}
+
+skinparam cloud {
+  BackgroundColor #F0E6FF
+  BorderColor #9B59B6
+}
+
+skinparam agent {
+  BackgroundColor #E8F8F5
+  BorderColor #1ABC9C
+}
+
+skinparam package {
+  BackgroundColor #FFFFFF
+  BorderColor #34495E
+  RoundCorner 15
+}
+
+title 紫金学院智能管理系统 - 系统架构图\nZijin College AI Management System Architecture
+
+' ==================== 前端层 ====================
+package "Frontend Layer (Vue 3 + Element Plus)" <<Rectangle>> {
+  
+  rectangle "Chat UI\nAI对话界面" as ChatUI #FFE6E6
+  rectangle "Data Management\n数据管理界面" as DataMgmt #E6F3FF
+  rectangle "Settings UI\n系统设置" as SettingsUI #FFF9E6
+  rectangle "Statistics\n数据统计" as Statistics #E6FFE6
+  
+  rectangle "Axios HTTP Client" as Axios #F0F0F0
+  rectangle "Vue Router" as Router #F0F0F0
+  rectangle "Pinia Store" as Store #F0F0F0
+}
+
+' ==================== API网关层 ====================
+package "API Gateway Layer (Spring Boot Controllers)" <<Rectangle>> {
+  rectangle "RESTful API Endpoints\n/api/agent/chat\n/api/students\n/api/employees\n..." as APIGateway #D5F5E3
+}
+
+' ==================== 后端业务层 ====================
+package "Backend Service Layer (Spring Boot)" <<Rectangle>> {
+  
+  ' LLM Agent核心服务
+  rectangle "<b>LLMAgentService</b>\nLLM代理服务" as LLMAgent #D4EFDF
+  rectangle "IntentRecognitionService\n意图识别服务" as IntentRec #D4EFDF
+  rectangle "Tool Executor\n工具执行器" as ToolExec #D4EFDF
+  
+  ' CRUD业务服务
+  rectangle "StudentService\n学生服务" as StudentSvc #EBDEF0
+  rectangle "EmployeeService\n员工服务" as EmployeeSvc #EBDEF0
+  rectangle "ClassService\n班级服务" as ClassSvc #EBDEF0
+  rectangle "DepartmentService\n部门服务" as DeptSvc #EBDEF0
+  rectangle "ChatHistoryService\n对话历史服务" as ChatSvc #EBDEF0
+  rectangle "ConfigService\n配置服务" as ConfigSvc #EBDEF0
+}
+
+' ==================== AI集成层 ====================
+cloud "AI Integration Layer" {
+  rectangle "<b>Zhipu AI GLM-4</b>\nFunction Calling API\n(open.bigmodel.cn)" as ZhipuAI #FADBD8
+  rectangle "DeepSeek API\n(备用提供商)" as DeepSeek #FADBD8
+}
+
+' ==================== 数据访问层 ====================
+package "Data Access Layer (MyBatis)" <<Rectangle>> {
+  rectangle "StudentMapper" as StudentMapper #FCF3CF
+  rectangle "EmployeeMapper" as EmployeeMapper #FCF3CF
+  rectangle "ClassInfoMapper" as ClassMapper #FCF3CF
+  rectangle "DepartmentMapper" as DeptMapper #FCF3CF
+  rectangle "ChatMessageMapper\nChatSessionMapper" as ChatMapper #FCF3CF
+  rectangle "ApiConfigMapper" as ConfigMapper #FCF3CF
+  rectangle "UserMapper" as UserMapper #FCF3CF
+}
+
+' ==================== 数据库层 ====================
+database "MySQL 8.0 Database\n(zijin_college)" {
+  rectangle "student\n(学生表)" as StudentDB #FEF9E7
+  rectangle "employee\n(员工表)" as EmployeeDB #FEF9E7
+  rectangle "class_info\n(班级表)" as ClassDB #FEF9E7
+  rectangle "department\n(部门表)" as DeptDB #FEF9E7
+  rectangle "chat_session\nchat_message\n(对话表)" as ChatDB #FEF9E7
+  rectangle "api_config\n(配置表)" as ConfigDB #FEF9E7
+  rectangle "sys_user\n(用户表)" as UserDB #FEF9E7
+}
+
+' ==================== 连接关系 ====================
+
+' 前端内部连接
+ChatUI --> Axios : 调用
+DataMgmt --> Axios : 调用
+SettingsUI --> Axios : 调用
+Statistics --> Axios : 调用
+
+Axios --> Router : 路由
+Axios --> Store : 状态管理
+
+' 前端到后端 (HTTP请求)
+Axios -down-> APIGateway : POST/GET\nHTTP/JSON
+
+' API网关到业务层
+APIGateway -down-> LLMAgent : /api/agent/chat
+APIGateway -down-> StudentSvc : /api/students
+APIGateway -down-> EmployeeSvc : /api/employees
+APIGateway -down-> ClassSvc : /api/classes
+APIGateway -down-> DeptSvc : /api/departments
+APIGateway -down-> ChatSvc : /api/chat/history
+APIGateway -down-> ConfigSvc : /api/config
+
+' LLM Agent内部流程
+LLMAgent -right-> IntentRec : 1.意图识别
+IntentRec -right-> ToolExec : 2.工具选择
+ToolExec -down-> StudentSvc : 3.执行操作
+ToolExec -down-> EmployeeSvc : 执行操作
+ToolExec -down-> ClassSvc : 执行操作
+ToolExec -down-> DeptSvc : 执行操作
+
+' AI集成 (外部API调用)
+LLMAgent -up-> ZhipuAI : REST API\nFunction Calling
+LLMAgent -[dashed]-> DeepSeek : 备用API
+
+' 业务层到数据访问层
+StudentSvc -down-> StudentMapper
+EmployeeSvc -down-> EmployeeMapper
+ClassSvc -down-> ClassMapper
+DeptSvc -down-> DeptMapper
+ChatSvc -down-> ChatMapper
+ConfigSvc -down-> ConfigMapper
+StudentSvc -down-> UserMapper
+
+' 数据访问层到数据库
+StudentMapper -down-> StudentDB
+EmployeeMapper -down-> EmployeeDB
+ClassMapper -down-> ClassDB
+DeptMapper -down-> DeptDB
+ChatMapper -down-> ChatDB
+ConfigMapper -down-> ConfigDB
+UserMapper -down-> UserDB
+
+' ==================== 注释说明 ====================
+
+note right of LLMAgent
+  <b>🤖 LLM Agent核心功能：</b>
+  • 自然语言理解 (NLU)
+  • 意图识别 (Intent Recognition)
+  • 参数提取 (Parameter Extraction)
+  • 工具选择 (Tool Selection)
+  • Function Calling模式
+  • 多轮对话上下文管理
+end note
+
+note left of ZhipuAI
+  <b>☁️ AI能力提供：</b>
+  • GLM-4大语言模型
+  • 智能对话生成
+  • 参数解析与提取
+  • 上下文理解
+  • 多语言支持
+end note
+
+note bottom of APIGateway
+  <b>🔌 RESTful API端点：</b>
+  • POST /api/agent/chat - AI对话
+  • GET/POST /api/students - 学生管理
+  • GET/POST /api/employees - 员工管理
+  • GET/POST /api/classes - 班级管理
+  • GET/POST /api/departments - 部门管理
+  • GET /api/chat/history - 对话历史
+  • GET/PUT /api/config - 系统配置
+end note
+
+legend right
+  |= 颜色 |= 含义 |
+  | <back:#FFE6E6>  </back> | 前端界面组件 |
+  | <back:#D5F5E3>  </back> | API网关层 |
+  | <back:#D4EFDF>  </back> | LLM Agent核心服务 |
+  | <back:#EBDEF0>  </back> | 业务逻辑服务 |
+  | <back:#FCF3CF>  </back> | 数据访问层 (Mapper) |
+  | <back:#FEF9E7>  </back> | 数据库表 |
+  | <back:#FADBD8>  </back> | 外部AI服务 |
+endlegend
+
+@enduml

@@ -9,6 +9,28 @@
 
 ---
 
+## 📸 项目截图
+
+### 🏗️ 系统架构图
+
+![系统架构图](docs/screenshots/architecture.png)
+
+> 💡 **提示**：如需查看PlantUML源码，请参考 [docs/architecture.puml](docs/architecture.puml)
+
+### 💬 AI智能对话界面
+
+![AI对话界面](docs/screenshots/chat-interface.png)
+
+*通过自然语言完成数据操作，体验智能化交互* 
+
+### 📊 数据管理界面
+
+![数据管理界面](docs/screenshots/data-management.png)
+
+*现代化的CRUD管理界面，支持多条件查询和可视化统计*
+
+---
+
 ## 📋 目录
 
 - [✨ 项目亮点](#-项目亮点)
