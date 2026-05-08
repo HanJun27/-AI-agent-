@@ -13,21 +13,9 @@
 
 ### 🏗️ 系统架构图
 
-> **查看方式**：
-> 1. 📄 [查看PlantUML源码](docs/architecture.puml)
-> 2. 🌐 [在线预览SVG图](https://www.plantuml.com/plantuml/uml/SyfFKj2rKt3CoKnELR1Io4ZDoSa70000)
-> 3. 💻 使用提供的HTML工具生成：[plantuml-svg-generator.html](docs/plantuml-svg-generator.html)
->
-> **本地生成SVG**：
-> ```bash
-> # 方法1：使用在线编辑器
-> # 访问 https://www.plantuml.com/plantuml/ 粘贴 docs/architecture.puml 内容
-> 
-> # 方法2：使用HTML工具
-> # 在浏览器中打开 docs/plantuml-svg-generator.html
-> ```
+![系统架构图](docs/screenshots/architecture.png)
 
-*架构图展示了完整的前后端分层架构，包含LLM Agent核心流程*
+> 💡 **提示**：PlantUML源码位于 [docs/architecture.puml](docs/architecture.puml)，可使用在线工具生成SVG/PNG格式
 
 ### 💬 AI智能对话界面
 
