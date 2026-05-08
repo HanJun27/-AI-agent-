@@ -229,7 +229,16 @@ public class CrudOperationTool {
             classInfo.setClassNo((String) params.get("classNo"));
             classInfo.setClassName((String) params.get("className"));
             classInfo.setMajor((String) params.get("major"));
-            classInfo.setGrade((String) params.get("grade"));
+            
+            // 处理年级参数（可能是Integer或String）
+            Object gradeObj = params.get("grade");
+            if (gradeObj != null) {
+                if (gradeObj instanceof Integer) {
+                    classInfo.setGrade(String.valueOf(gradeObj));
+                } else {
+                    classInfo.setGrade((String) gradeObj);
+                }
+            }
             
             if (params.containsKey("studentCount")) {
                 classInfo.setStudentCount((Integer) params.get("studentCount"));
@@ -252,6 +261,8 @@ public class CrudOperationTool {
             classInfoService.addClass(classInfo);
             return String.format("✅ 成功添加班级：%s（班号：%s）", classInfo.getClassName(), classInfo.getClassNo());
         } catch (Exception e) {
+            System.err.println("添加班级异常: " + e.getMessage());
+            e.printStackTrace();
             return "❌ 添加班级失败：" + e.getMessage();
         }
     }
@@ -607,7 +618,13 @@ public class CrudOperationTool {
                 updated = true;
             }
             if (params.containsKey("grade")) {
-                classInfo.setGrade((String) params.get("grade"));
+                // 处理年级参数（可能是Integer或String）
+                Object gradeObj = params.get("grade");
+                if (gradeObj instanceof Integer) {
+                    classInfo.setGrade(String.valueOf(gradeObj));
+                } else {
+                    classInfo.setGrade((String) gradeObj);
+                }
                 updated = true;
             }
             if (params.containsKey("studentCount")) {

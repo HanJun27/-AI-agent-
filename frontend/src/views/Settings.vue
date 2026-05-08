@@ -1,12 +1,52 @@
 <script setup lang="ts">
 import { ref, onMounted, onActivated } from 'vue'
-import { Settings as SettingsIcon, Key, Info, Save, TestTube2, CheckCircle } from 'lucide-vue-next'
+import { Settings as SettingsIcon, Key, Info, Save, TestTube2, CheckCircle, MessageSquare } from 'lucide-vue-next'
 import { configApi, preferenceApi } from '@/api/config'
 
 // 当前激活的标签页
 const activeTab = ref('api')
 
-// API配置数据
+// 对话设置数据
+const chatSettings = ref({
+  priorityMode: 'llm_agent', // 优先模式
+  fallbackMode: 'none'       // 降级模式
+})
+
+// 优先选项
+const priorityOptions = [
+  { value: 'llm_agent', label: 'LLM Agent（智能工具选择）' },
+  { value: 'llm_parse', label: 'LLM解析JSON' },
+  { value: 'rule', label: '规则匹配' }
+]
+
+// 降级选项
+const fallbackOptions = [
+  { value: 'none', label: '无（不降级）' },
+  { value: 'llm_parse', label: 'LLM解析JSON' },
+  { value: 'rule', label: '规则匹配' }
+]
+
+// 加载对话设置
+const loadChatSettings = () => {
+  const savedPriority = localStorage.getItem('priorityMode')
+  const savedFallback = localStorage.getItem('fallbackMode')
+  
+  if (savedPriority) {
+    chatSettings.value.priorityMode = savedPriority
+  }
+  if (savedFallback) {
+    chatSettings.value.fallbackMode = savedFallback
+  }
+}
+
+// 保存对话设置
+const saveChatSettings = () => {
+  localStorage.setItem('priorityMode', chatSettings.value.priorityMode)
+  localStorage.setItem('fallbackMode', chatSettings.value.fallbackMode)
+  alert('对话设置已保存！刷新Chat页面后生效。')
+  console.log('对话设置已保存:', chatSettings.value)
+}
+
 interface ApiConfig {
   name: string
   key: string
@@ -205,12 +245,14 @@ const saveGeneralSettings = async () => {
 onMounted(() => {
   loadApiConfigs()
   loadUserPreferences()
+  loadChatSettings()
 })
 
 // keep-alive 激活时重新加载
 onActivated(() => {
   loadApiConfigs()
   loadUserPreferences()
+  loadChatSettings()
 })
 </script>
 
@@ -255,6 +297,19 @@ onActivated(() => {
           >
             <SettingsIcon :size="20" />
             <span>通用设置</span>
+          </button>
+          
+          <button
+            @click="activeTab = 'chat'"
+            :class="[
+              activeTab === 'chat' 
+                ? 'bg-purple-50 text-purple-600 border-r-4 border-purple-600' 
+                : 'text-slate-600 hover:bg-slate-50'
+            ]"
+            class="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors font-medium"
+          >
+            <MessageSquare :size="20" />
+            <span>对话设置</span>
           </button>
           
           <button
@@ -455,6 +510,60 @@ onActivated(() => {
 
             <button
               @click="saveGeneralSettings"
+              class="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium flex items-center gap-2"
+            >
+              <Save :size="18" />
+              保存设置
+            </button>
+          </div>
+        </div>
+
+        <!-- 对话设置标签页 -->
+        <div v-if="activeTab === 'chat'" class="max-w-4xl">
+          <div class="mb-6">
+            <h2 class="text-2xl font-bold text-slate-900 mb-2">对话设置</h2>
+            <p class="text-slate-500">配置AI对话的识别模式和降级策略</p>
+          </div>
+
+          <div class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm space-y-6">
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-2">优先模式</label>
+              <select
+                v-model="chatSettings.priorityMode"
+                class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              >
+                <option v-for="option in priorityOptions" :key="option.value" :value="option.value">
+                  {{ option.label }}
+                </option>
+              </select>
+              <p class="text-xs text-slate-500 mt-1">
+                选择AI对话时的首选识别方式。LLM Agent模式最智能，支持自然语言操作。
+              </p>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-2">降级模式</label>
+              <select
+                v-model="chatSettings.fallbackMode"
+                class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              >
+                <option v-for="option in fallbackOptions" :key="option.value" :value="option.value">
+                  {{ option.label }}
+                </option>
+              </select>
+              <p class="text-xs text-slate-500 mt-1">
+                当优先模式失败时使用的备选方案。选择“无”表示不降级。
+              </p>
+            </div>
+
+            <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded">
+              <p class="text-sm text-blue-800">
+                <strong>💡 提示：</strong>修改设置后需要刷新Chat页面才能生效。
+              </p>
+            </div>
+
+            <button
+              @click="saveChatSettings"
               class="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium flex items-center gap-2"
             >
               <Save :size="18" />

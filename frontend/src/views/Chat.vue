@@ -22,23 +22,16 @@ const messageInput = ref('')
 const messages = ref<Message[]>([])
 const isTyping = ref(false)
 const selectedProvider = ref<string>('') // 当前选择的AI提供商
-const priorityMode = ref<string>('llm_agent') // 优先选项，默认LLM Agent
-const fallbackMode = ref<string>('none') // 降级选项，默认无
 let messageId = 1
 
-// 优先选项
-const priorityOptions = [
-  { value: 'llm_agent', label: 'LLM Agent（智能工具选择）' },
-  { value: 'llm_parse', label: 'LLM解析JSON' },
-  { value: 'rule', label: '规则匹配' }
-]
+// 从 localStorage 读取对话设置
+const getPriorityMode = (): string => {
+  return localStorage.getItem('priorityMode') || 'llm_agent'
+}
 
-// 降级选项
-const fallbackOptions = [
-  { value: 'none', label: '无（不降级）' },
-  { value: 'llm_parse', label: 'LLM解析JSON' },
-  { value: 'rule', label: '规则匹配' }
-]
+const getFallbackMode = (): string => {
+  return localStorage.getItem('fallbackMode') || 'none'
+}
 
 // 会话管理
 const sessions = ref<ChatSession[]>([
@@ -80,19 +73,22 @@ const sendMessage = async () => {
     let apiUrl = '/chat/send'  // 默认传统接口
     let modeParam = ''
     
-    if (priorityMode.value === 'llm_agent') {
+    const priorityMode = getPriorityMode()
+    const fallbackMode = getFallbackMode()
+    
+    if (priorityMode === 'llm_agent') {
       // 使用LLM Agent模式
       apiUrl = '/chat/agent'
       modeParam = 'agent'
     } else {
       // 使用传统模式，计算recognitionMode
-      if (priorityMode.value === 'llm_parse' && fallbackMode.value === 'none') {
+      if (priorityMode === 'llm_parse' && fallbackMode === 'none') {
         modeParam = 'llm_only'
-      } else if (priorityMode.value === 'rule' && fallbackMode.value === 'none') {
+      } else if (priorityMode === 'rule' && fallbackMode === 'none') {
         modeParam = 'rule_only'
-      } else if (priorityMode.value === 'llm_parse' && fallbackMode.value === 'rule') {
+      } else if (priorityMode === 'llm_parse' && fallbackMode === 'rule') {
         modeParam = 'llm_first'
-      } else if (priorityMode.value === 'rule' && fallbackMode.value === 'llm_parse') {
+      } else if (priorityMode === 'rule' && fallbackMode === 'llm_parse') {
         modeParam = 'rule_first'
       } else {
         modeParam = 'llm_first'  // 默认
@@ -300,8 +296,7 @@ onMounted(async () => {
   loadSessions()
   // 加载已启用的API配置
   await loadEnabledProvider()
-  // 加载识别模式设置
-  loadRecognitionSettings()
+  // 对话设置已从 Settings 页面管理，通过 localStorage 读取
 })
 
 // 加载已启用的API提供商
@@ -329,28 +324,6 @@ const loadEnabledProvider = async () => {
   } catch (error) {
     console.error('加载API配置失败:', error)
   }
-}
-
-// 保存识别模式设置到localStorage
-const saveRecognitionSettings = () => {
-  localStorage.setItem('priorityMode', priorityMode.value)
-  localStorage.setItem('fallbackMode', fallbackMode.value)
-  console.log('识别模式设置已保存:', { priority: priorityMode.value, fallback: fallbackMode.value })
-}
-
-// 加载识别模式设置
-const loadRecognitionSettings = () => {
-  const savedPriority = localStorage.getItem('priorityMode')
-  const savedFallback = localStorage.getItem('fallbackMode')
-  
-  if (savedPriority) {
-    priorityMode.value = savedPriority
-  }
-  if (savedFallback) {
-    fallbackMode.value = savedFallback
-  }
-  
-  console.log('识别模式设置已加载:', { priority: priorityMode.value, fallback: fallbackMode.value })
 }
 </script>
 
@@ -467,35 +440,6 @@ const loadRecognitionSettings = () => {
               <option value="qwen">通义千问</option>
               <option value="openai">OpenAI</option>
             </select>
-          </div>
-          
-          <!-- 识别模式选择器 -->
-          <div class="flex items-center gap-4">
-            <div class="flex items-center gap-2">
-              <label class="text-sm text-slate-600">优先：</label>
-              <select 
-                v-model="priorityMode"
-                @change="saveRecognitionSettings"
-                class="px-3 py-1.5 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white"
-              >
-                <option v-for="option in priorityOptions" :key="option.value" :value="option.value">
-                  {{ option.label }}
-                </option>
-              </select>
-            </div>
-            
-            <div class="flex items-center gap-2">
-              <label class="text-sm text-slate-600">降级：</label>
-              <select 
-                v-model="fallbackMode"
-                @change="saveRecognitionSettings"
-                class="px-3 py-1.5 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white"
-              >
-                <option v-for="option in fallbackOptions" :key="option.value" :value="option.value">
-                  {{ option.label }}
-                </option>
-              </select>
-            </div>
           </div>
         </div>
       </div>

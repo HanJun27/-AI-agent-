@@ -49,6 +49,21 @@ const menuItems = [
     <!-- Header -->
     <header class="bg-primary h-16 flex items-center justify-between px-6 shadow-l1 z-20">
       <div class="flex items-center gap-3">
+        <!-- 学校Logo图标 -->
+        <svg width="32" height="32" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" class="flex-shrink-0">
+          <!-- 外圆环 -->
+          <circle cx="50" cy="50" r="45" stroke="white" stroke-width="3" fill="none"/>
+          <!-- 内圆 -->
+          <circle cx="50" cy="50" r="38" stroke="white" stroke-width="2" fill="rgba(255,255,255,0.1)"/>
+          <!-- 书本图案（代表学术） -->
+          <path d="M30 45 L50 35 L70 45 L70 65 L50 55 L30 65 Z" fill="white" opacity="0.9"/>
+          <!-- 书页线条 -->
+          <line x1="50" y1="35" x2="50" y2="55" stroke="#4F46E5" stroke-width="2"/>
+          <line x1="40" y1="40" x2="40" y2="60" stroke="#4F46E5" stroke-width="1.5" opacity="0.6"/>
+          <line x1="60" y1="40" x2="60" y2="60" stroke="#4F46E5" stroke-width="1.5" opacity="0.6"/>
+          <!-- 星星（代表卓越） -->
+          <polygon points="50,25 52,30 57,30 53,33 54,38 50,35 46,38 47,33 43,30 48,30" fill="white"/>
+        </svg>
         <h1 class="text-white text-xl font-semibold tracking-wide">南京理工大学紫金学院</h1>
       </div>
       
@@ -75,8 +90,22 @@ const menuItems = [
       <aside class="w-64 bg-white border-r border-gray-100 flex flex-col justify-between shadow-sm z-10">
         <div class="py-6">
           <div class="flex flex-col items-center mb-8 px-4">
-            <div class="w-16 h-16 bg-white rounded-md mb-2 flex items-center justify-center border border-gray-100 shadow-sm p-1">
-               <img src="https://www.njustzj.edu.cn/_upload/tpl/00/f8/248/template248/images/logo.png" alt="Logo" class="w-full object-contain" />
+            <div class="w-16 h-16 bg-white rounded-lg mb-3 flex items-center justify-center border border-gray-200 shadow-md">
+              <!-- 学校Logo SVG图标 -->
+              <svg width="56" height="56" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- 外圆环 -->
+                <circle cx="50" cy="50" r="45" stroke="#4F46E5" stroke-width="3" fill="none"/>
+                <!-- 内圆 -->
+                <circle cx="50" cy="50" r="38" stroke="#4F46E5" stroke-width="2" fill="rgba(79,70,229,0.1)"/>
+                <!-- 书本图案（代表学术） -->
+                <path d="M30 45 L50 35 L70 45 L70 65 L50 55 L30 65 Z" fill="#4F46E5" opacity="0.9"/>
+                <!-- 书页线条 -->
+                <line x1="50" y1="35" x2="50" y2="55" stroke="white" stroke-width="2.5"/>
+                <line x1="40" y1="40" x2="40" y2="60" stroke="white" stroke-width="2" opacity="0.7"/>
+                <line x1="60" y1="40" x2="60" y2="60" stroke="white" stroke-width="2" opacity="0.7"/>
+                <!-- 星星（代表卓越） -->
+                <polygon points="50,25 52,30 57,30 53,33 54,38 50,35 46,38 47,33 43,30 48,30" fill="#4F46E5"/>
+              </svg>
             </div>
             <h2 class="text-primary font-bold text-lg">南京理工大学</h2>
             <p class="text-gray-500 text-xs font-medium">紫金学院</p>

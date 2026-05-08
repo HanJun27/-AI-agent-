@@ -13,19 +13,18 @@
 
 ### 🏗️ 系统架构图
 
-![系统架构图](docs/screenshots/architecture.png)
-
-> 💡 **提示**：PlantUML源码位于 [docs/architecture.puml](docs/architecture.puml)，可使用在线工具生成SVG/PNG格式
+![系统架构图](docs/screenshots/ZijinCollegeSystemArchitecture.png)
 
 ### 💬 AI智能对话界面
 
-![AI对话界面](docs/screenshots/chat-interface.png)
+![AI对话界面](docs/screenshots/1.png)
+![AI对话界面](docs/screenshots/2.png)
 
 *通过自然语言完成数据操作，体验智能化交互* 
 
 ### 📊 数据管理界面
 
-![数据管理界面](docs/screenshots/data-management.png)
+![数据管理界面](docs/screenshots/3.png)
 
 *现代化的CRUD管理界面，支持多条件查询和可视化统计*
 
