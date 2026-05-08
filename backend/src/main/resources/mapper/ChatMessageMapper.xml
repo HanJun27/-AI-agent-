@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zijin.college.mapper.ChatMessageMapper">
+
+    <resultMap id="ChatMessageResultMap" type="com.zijin.college.entity.ChatMessage">
+        <id property="id" column="id"/>
+        <result property="sessionId" column="session_id"/>
+        <result property="role" column="role"/>
+        <result property="content" column="content"/>
+        <result property="timestamp" column="timestamp"/>
+    </resultMap>
+
+    <select id="findBySessionId" resultMap="ChatMessageResultMap">
+        SELECT * FROM chat_message WHERE session_id = #{sessionId} ORDER BY timestamp ASC
+    </select>
+
+    <insert id="insert">
+        INSERT INTO chat_message (session_id, role, content, timestamp)
+        VALUES (#{sessionId}, #{role}, #{content}, #{timestamp})
+    </insert>
+
+    <insert id="batchInsert">
+        INSERT INTO chat_message (session_id, role, content, timestamp) VALUES
+        <foreach collection="messages" item="msg" separator=",">
+            (#{msg.sessionId}, #{msg.role}, #{msg.content}, #{msg.timestamp})
+        </foreach>
+    </insert>
+
+    <delete id="deleteBySessionId">
+        DELETE FROM chat_message WHERE session_id = #{sessionId}
+    </delete>
+
+</mapper>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zijin.college.mapper.UserPreferenceMapper">
+
+    <resultMap id="UserPreferenceResultMap" type="com.zijin.college.entity.UserPreference">
+        <id property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="language" column="language"/>
+        <result property="theme" column="theme"/>
+        <result property="notifications" column="notifications"/>
+        <result property="autoSave" column="auto_save"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <select id="findByUserId" resultMap="UserPreferenceResultMap">
+        SELECT * FROM user_preferences WHERE user_id = #{userId} LIMIT 1
+    </select>
+
+    <insert id="insert">
+        INSERT INTO user_preferences (user_id, language, theme, notifications, auto_save)
+        VALUES (#{userId}, #{language}, #{theme}, #{notifications}, #{autoSave})
+    </insert>
+
+    <update id="update">
+        UPDATE user_preferences
+        SET language = #{language},
+            theme = #{theme},
+            notifications = #{notifications},
+            auto_save = #{autoSave}
+        WHERE user_id = #{userId}
+    </update>
+
+</mapper>

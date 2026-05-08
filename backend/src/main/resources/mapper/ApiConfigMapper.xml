@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zijin.college.mapper.ApiConfigMapper">
+
+    <resultMap id="ApiConfigResultMap" type="com.zijin.college.entity.ApiConfig">
+        <id property="id" column="id"/>
+        <result property="provider" column="provider"/>
+        <result property="providerName" column="provider_name"/>
+        <result property="apiKey" column="api_key"/>
+        <result property="model" column="model"/>
+        <result property="baseUrl" column="base_url"/>
+        <result property="enabled" column="enabled"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <select id="findAll" resultMap="ApiConfigResultMap">
+        SELECT * FROM api_config ORDER BY id
+    </select>
+
+    <select id="findByProvider" resultMap="ApiConfigResultMap">
+        SELECT * FROM api_config WHERE provider = #{provider}
+    </select>
+
+    <insert id="insert">
+        INSERT INTO api_config (provider, provider_name, api_key, model, base_url, enabled)
+        VALUES (#{provider}, #{providerName}, #{apiKey}, #{model}, #{baseUrl}, #{enabled})
+    </insert>
+
+    <update id="update">
+        UPDATE api_config
+        SET provider_name = #{providerName},
+            api_key = #{apiKey},
+            model = #{model},
+            base_url = #{baseUrl},
+            enabled = #{enabled}
+        WHERE provider = #{provider}
+    </update>
+
+    <delete id="deleteByProvider">
+        DELETE FROM api_config WHERE provider = #{provider}
+    </delete>
+
+</mapper>

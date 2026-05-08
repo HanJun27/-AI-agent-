@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zijin.college.mapper.ChatSessionMapper">
+
+    <resultMap id="ChatSessionResultMap" type="com.zijin.college.entity.ChatSession">
+        <id property="id" column="id"/>
+        <result property="sessionId" column="session_id"/>
+        <result property="title" column="title"/>
+        <result property="userId" column="user_id"/>
+        <result property="messageCount" column="message_count"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <select id="findByUserId" resultMap="ChatSessionResultMap">
+        SELECT * FROM chat_session WHERE user_id = #{userId} ORDER BY update_time DESC
+    </select>
+
+    <select id="findBySessionId" resultMap="ChatSessionResultMap">
+        SELECT * FROM chat_session WHERE session_id = #{sessionId}
+    </select>
+
+    <insert id="insert">
+        INSERT INTO chat_session (session_id, title, user_id, message_count)
+        VALUES (#{sessionId}, #{title}, #{userId}, #{messageCount})
+    </insert>
+
+    <update id="update">
+        UPDATE chat_session
+        SET title = #{title},
+            message_count = #{messageCount}
+        WHERE session_id = #{sessionId}
+    </update>
+
+    <delete id="deleteBySessionId">
+        DELETE FROM chat_session WHERE session_id = #{sessionId}
+    </delete>
+
+</mapper>

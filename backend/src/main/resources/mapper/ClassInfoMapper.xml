@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zijin.college.mapper.ClassInfoMapper">
+
+    <resultMap id="ClassInfoResultMap" type="com.zijin.college.entity.ClassInfo">
+        <id property="id" column="id"/>
+        <result property="classNo" column="class_no"/>
+        <result property="className" column="class_name"/>
+        <result property="major" column="major"/>
+        <result property="grade" column="grade"/>
+        <result property="teacher" column="teacher"/>
+        <result property="studentCount" column="student_count"/>
+        <result property="classroom" column="classroom"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <select id="findAll" resultMap="ClassInfoResultMap">
+        SELECT * FROM class_info
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (class_no LIKE CONCAT('%', #{keyword}, '%') 
+                     OR class_name LIKE CONCAT('%', #{keyword}, '%')
+                     OR major LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+        </where>
+        ORDER BY id DESC
+    </select>
+
+    <select id="findById" resultMap="ClassInfoResultMap">
+        SELECT * FROM class_info WHERE id = #{id}
+    </select>
+
+    <select id="findByClassNo" resultMap="ClassInfoResultMap">
+        SELECT * FROM class_info WHERE class_no = #{classNo}
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO class_info (class_no, class_name, major, grade, teacher, student_count, classroom)
+        VALUES (#{classNo}, #{className}, #{major}, #{grade}, #{teacher}, #{studentCount}, #{classroom})
+    </insert>
+
+    <update id="update">
+        UPDATE class_info
+        SET class_no = #{classNo},
+            class_name = #{className},
+            major = #{major},
+            grade = #{grade},
+            teacher = #{teacher},
+            student_count = #{studentCount},
+            classroom = #{classroom}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM class_info WHERE id = #{id}
+    </delete>
+
+    <select id="countAll" resultType="int">
+        SELECT COUNT(*) FROM class_info
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (class_no LIKE CONCAT('%', #{keyword}, '%') 
+                     OR class_name LIKE CONCAT('%', #{keyword}, '%')
+                     OR major LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+        </where>
+    </select>
+
+</mapper>

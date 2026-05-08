@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zijin.college.mapper.DepartmentMapper">
+    
+    <resultMap id="DepartmentResultMap" type="com.zijin.college.entity.Department">
+        <id property="id" column="id"/>
+        <result property="deptNo" column="dept_no"/>
+        <result property="deptName" column="dept_name"/>
+        <result property="location" column="location"/>
+        <result property="manager" column="manager"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+    
+    <select id="findAll" resultMap="DepartmentResultMap">
+        SELECT * FROM department
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (dept_no LIKE CONCAT('%', #{keyword}, '%') 
+                     OR dept_name LIKE CONCAT('%', #{keyword}, '%')
+                     OR manager LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+        </where>
+        ORDER BY id ASC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+    
+    <select id="findById" resultMap="DepartmentResultMap">
+        SELECT * FROM department WHERE id = #{id}
+    </select>
+    
+    <select id="findByDeptNo" resultMap="DepartmentResultMap">
+        SELECT * FROM department WHERE dept_no = #{deptNo}
+    </select>
+    
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO department (dept_no, dept_name, location, manager)
+        VALUES (#{deptNo}, #{deptName}, #{location}, #{manager})
+    </insert>
+    
+    <update id="update">
+        UPDATE department
+        SET dept_no = #{deptNo},
+            dept_name = #{deptName},
+            location = #{location},
+            manager = #{manager}
+        WHERE id = #{id}
+    </update>
+    
+    <delete id="delete">
+        DELETE FROM department WHERE id = #{id}
+    </delete>
+    
+    <select id="count" resultType="int">
+        SELECT COUNT(*) FROM department
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (dept_no LIKE CONCAT('%', #{keyword}, '%') 
+                     OR dept_name LIKE CONCAT('%', #{keyword}, '%')
+                     OR manager LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+        </where>
+    </select>
+    
+</mapper>

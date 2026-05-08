@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zijin.college.mapper.StudentMapper">
+
+    <resultMap id="StudentResultMap" type="com.zijin.college.entity.Student">
+        <id property="id" column="id"/>
+        <result property="stuNo" column="stu_no"/>
+        <result property="stuName" column="stu_name"/>
+        <result property="gender" column="gender"/>
+        <result property="age" column="age"/>
+        <result property="phone" column="phone"/>
+        <result property="email" column="email"/>
+        <result property="classId" column="class_id"/>
+        <result property="major" column="major"/>
+        <result property="enrollmentDate" column="enrollment_date"/>
+        <result property="status" column="status"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <select id="findAll" resultMap="StudentResultMap">
+        SELECT * FROM student
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (stu_no LIKE CONCAT('%', #{keyword}, '%') 
+                     OR stu_name LIKE CONCAT('%', #{keyword}, '%')
+                     OR major LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+        </where>
+        ORDER BY id DESC
+    </select>
+
+    <select id="findById" resultMap="StudentResultMap">
+        SELECT * FROM student WHERE id = #{id}
+    </select>
+
+    <select id="findByStuNo" resultMap="StudentResultMap">
+        SELECT * FROM student WHERE stu_no = #{stuNo}
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO student (stu_no, stu_name, gender, age, phone, email, class_id, major, enrollment_date, status)
+        VALUES (#{stuNo}, #{stuName}, #{gender}, #{age}, #{phone}, #{email}, #{classId}, #{major}, #{enrollmentDate}, #{status})
+    </insert>
+
+    <update id="update">
+        UPDATE student
+        SET stu_no = #{stuNo},
+            stu_name = #{stuName},
+            gender = #{gender},
+            age = #{age},
+            phone = #{phone},
+            email = #{email},
+            class_id = #{classId},
+            major = #{major},
+            enrollment_date = #{enrollmentDate},
+            status = #{status}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM student WHERE id = #{id}
+    </delete>
+
+    <select id="countAll" resultType="int">
+        SELECT COUNT(*) FROM student
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (stu_no LIKE CONCAT('%', #{keyword}, '%') 
+                     OR stu_name LIKE CONCAT('%', #{keyword}, '%')
+                     OR major LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+        </where>
+    </select>
+
+</mapper>

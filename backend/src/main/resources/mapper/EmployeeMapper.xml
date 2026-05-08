@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zijin.college.mapper.EmployeeMapper">
+
+    <resultMap id="EmployeeResultMap" type="com.zijin.college.entity.Employee">
+        <id property="id" column="id"/>
+        <result property="empNo" column="emp_no"/>
+        <result property="empName" column="emp_name"/>
+        <result property="gender" column="gender"/>
+        <result property="age" column="age"/>
+        <result property="phone" column="phone"/>
+        <result property="email" column="email"/>
+        <result property="position" column="position"/>
+        <result property="deptId" column="dept_id"/>
+        <result property="hireDate" column="hire_date"/>
+        <result property="status" column="status"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <select id="findAll" resultMap="EmployeeResultMap">
+        SELECT * FROM employee
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (emp_no LIKE CONCAT('%', #{keyword}, '%') 
+                     OR emp_name LIKE CONCAT('%', #{keyword}, '%')
+                     OR position LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+        </where>
+        ORDER BY id DESC
+    </select>
+
+    <select id="findById" resultMap="EmployeeResultMap">
+        SELECT * FROM employee WHERE id = #{id}
+    </select>
+
+    <select id="findByEmpNo" resultMap="EmployeeResultMap">
+        SELECT * FROM employee WHERE emp_no = #{empNo}
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO employee (emp_no, emp_name, gender, age, phone, email, position, dept_id, hire_date, status)
+        VALUES (#{empNo}, #{empName}, #{gender}, #{age}, #{phone}, #{email}, #{position}, #{deptId}, #{hireDate}, #{status})
+    </insert>
+
+    <update id="update">
+        UPDATE employee
+        SET emp_no = #{empNo},
+            emp_name = #{empName},
+            gender = #{gender},
+            age = #{age},
+            phone = #{phone},
+            email = #{email},
+            position = #{position},
+            dept_id = #{deptId},
+            hire_date = #{hireDate},
+            status = #{status}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM employee WHERE id = #{id}
+    </delete>
+
+    <select id="countAll" resultType="int">
+        SELECT COUNT(*) FROM employee
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (emp_no LIKE CONCAT('%', #{keyword}, '%') 
+                     OR emp_name LIKE CONCAT('%', #{keyword}, '%')
+                     OR position LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+        </where>
+    </select>
+
+</mapper>

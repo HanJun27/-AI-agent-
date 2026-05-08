@@ -1,0 +1,40 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-surface text-gray-900 font-sans antialiased;
+  }
+}
+
+@layer components {
+  .active-sidebar-item {
+    @apply bg-primary-light text-primary border-r-4 border-primary;
+  }
+
+  .btn-icon {
+    @apply p-1.5 rounded-full text-white transition-all duration-200 hover:scale-110 active:scale-95;
+  }
+}
+
+/* Modal Transition */
+.modal-enter-active,
+.modal-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.modal-enter-from,
+.modal-leave-to {
+  opacity: 0;
+}
+
+.modal-enter-active > div,
+.modal-leave-active > div {
+  transition: transform 0.3s ease;
+}
+
+.modal-enter-from > div,
+.modal-leave-to > div {
+  transform: scale(0.9);
+}
