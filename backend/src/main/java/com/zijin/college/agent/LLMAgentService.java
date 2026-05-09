@@ -129,14 +129,58 @@ public class LLMAgentService {
         }
         
         // 解析LLM的决策
-        return parseAgentDecision(llmResponse);
+        AgentDecision decision = parseAgentDecision(llmResponse);
+        
+        // 如果解析结果为null，但LLM响应不为空，说明是格式问题而非调用失败
+        if (decision == null && llmResponse != null && !llmResponse.isEmpty()) {
+            System.out.println("⚠️ LLM返回格式不正确，尝试作为普通对话处理");
+            // 创建一个包含友好提示的决策对象
+            decision = new AgentDecision();
+            decision.setLlmResponse(
+                "⚠️ AI助手暂时无法理解您的请求。\n\n" +
+                "可能的原因：\n" +
+                "1. LLM返回的格式不符合要求\n" +
+                "2. 请尝试换一种表达方式\n\n" +
+                "示例：\n" +
+                "- \"查询学号为S2022001的学生\"\n" +
+                "- \"帮我找一下张三的信息\"\n" +
+                "- \"添加一个学生，学号S2024001，姓名李四\"\n\n" +
+                "或者您可以切换到其他识别模式（系统设置 > 对话设置）"
+            );
+        }
+        
+        return decision;
     }
     
     /**
      * 构建Agent系统Prompt - 定义可用工具
      */
     private String buildAgentSystemPrompt() {
-        return "你是紫金学院管理系统的智能助手。你可以调用以下工具来帮助用户：\n\n" +
+        return "🚨 **极其重要的输出格式要求** 🚨\n" +
+               "你必须严格遵守以下规则，否则系统将无法正常工作：\n\n" +
+               
+               "### ⚠️ 当你需要调用工具时，必须且只能返回以下格式的JSON：\n" +
+               "{\"tool\":\"工具名\",\"params\":{参数对象},\"thought\":\"思考过程\"}\n\n" +
+               
+               "**绝对禁止**的格式（违反会导致系统错误）：\n" +
+               "❌ 工具名\\n{\"params\":...} （这是最常见的错误！）\n" +
+               "❌ {\"params\":...} （缺少tool字段）\n" +
+               "❌ ```json{\"tool\":...}``` （不要使用Markdown代码块）\n" +
+               "❌ 任何非JSON格式的文本\n\n" +
+               
+               "**正确示例**：\n" +
+               "用户：\"查询学号为S2022001的学生\"\n" +
+               "✅ 你应该返回：{\"tool\":\"queryStudents\",\"params\":{\"stuNo\":\"S2022001\"},\"thought\":\"查询学号为S2022001的学生信息\"}\n\n" +
+               
+               "用户：\"帮我找一下赵六的信息\"\n" +
+               "✅ 你应该返回：{\"tool\":\"queryStudents\",\"params\":{\"name\":\"赵六\"},\"thought\":\"查找姓名为赵六的学生\"}\n\n" +
+               
+               "用户：\"把班级人数改为60\"\n" +
+               "✅ 你应该返回：{\"tool\":\"updateClass\",\"params\":{\"classNo\":\"C2023001\",\"studentCount\":60},\"thought\":\"修改班级人数为60\"}\n\n" +
+               
+               "---\n\n" +
+               
+               "你是紫金学院管理系统的智能助手。你可以调用以下工具来帮助用户：\n\n" +
                
                "## 可用工具列表\n\n" +
                
@@ -244,30 +288,10 @@ public class LLMAgentService {
                "→ 使用 analyzeXXX 工具\n" +
                "示例：\"分析学生性别分布\" → analyzeStudentGender\n\n" +
                
-               "## ⚠️ 输出格式（极其重要，必须遵守）\n" +
-               "### 情况1：需要调用工具\n" +
-               "必须返回严格的JSON格式，包含tool、params、thought三个字段：\n" +
-               "{\"tool\":\"工具名\",\"params\":{参数对象},\"thought\":\"思考过程\"}\n\n" +
-               
-               "❌ 错误示例1：只返回 {\"name\":\"孙七\"} （缺少tool字段）\n" +
-               "❌ 错误示例2：返回 queryStudents\\n{\"name\":\"孙七\"} （不是有效JSON）\n" +
-               "❌ 错误示例3：用户说\"把班级人数改为60\"，你返回 {\"className\":\"TEST_CLASS\"} （应该用updateClass而非queryClasses）\n" +
-               "✅ 正确示例1：{\"tool\":\"queryStudents\",\"params\":{\"name\":\"孙七\"},\"thought\":\"查询学生\"}\n" +
-               "✅ 正确示例2：{\"tool\":\"updateClass\",\"params\":{\"classNo\":\"C2023001\",\"studentCount\":60},\"thought\":\"修改班级人数\"}\n" +
-               "✅ 正确示例3：{\"tool\":\"analyzeStudentGender\",\"params\":{},\"thought\":\"分析性别分布\"}\n\n" +
-               
-               "### 情况2：不需要调用工具\n" +
-               "直接返回自然语言回复，不要包含JSON。\n\n" +
-               
                "## 🚫 禁止行为（违反将导致系统错误）\n" +
-               "1. ❌ 不要返回Markdown代码块（如 ```json ... ```）\n" +
-               "2. ❌ 不要返回解释文字 + JSON的混合内容\n" +
-               "3. ❌ 不要只返回params而省略tool字段\n" +
-               "4. ❌ 不要把修改操作误解为查询操作\n" +
-               "5. ❌ 不要把添加操作误解为查询操作\n" +
-               "6. ✅ 必须严格遵循JSON格式\n" +
-               "7. ✅ 必须包含tool字段\n" +
-               "8. ✅ 必须根据用户意图选择正确的工具类型\n\n" +
+               "1. ❌ 不要把修改操作误解为查询操作\n" +
+               "2. ❌ 不要把添加操作误解为查询操作\n" +
+               "3. ✅ 必须根据用户意图选择正确的工具类型\n\n" +
                
                "## 重要规则\n" +
                "1. 电话号码、学号等长数字必须作为字符串，不要转成数字\n" +
@@ -450,6 +474,12 @@ public class LLMAgentService {
                 }
                 
                 return decision;
+            } else {
+                // JSON存在但没有tool字段，这是错误的格式
+                System.err.println("⚠️ LLM返回的JSON缺少tool字段: " + cleanJson);
+                System.err.println("⚠️ 这可能是LLM没有遵守输出格式，将视为普通对话");
+                // 不降级，直接返回null让上层处理
+                return null;
             }
             
         } catch (Exception e) {
